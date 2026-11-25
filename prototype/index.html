@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fondslupe – Fondsunterlagen verständlich analysiert (Prototyp)</title>
+  <meta name="description" content="Fondsunterlagen und Bankempfehlungen hochladen und in klarer Sprache verstehen: Kosten, Risiken, Rückgabe, Abgleich mit der Empfehlung und Fragen an die Bank.">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><span class="brand-mark"><i data-icon="logo"></i></span>Fondslupe <small>Prototyp</small></a>
+      <button class="btn btn-secondary btn-icon nav-toggle" type="button" aria-expanded="false" aria-controls="hauptnavigation" aria-label="Menü"><i data-icon="menu"></i></button>
+      <nav id="hauptnavigation" class="nav" aria-label="Hauptnavigation">
+        <a href="#so-gehts">So funktioniert’s</a>
+        <a href="bericht.html">Beispielbericht</a>
+        <a href="sicherheit.html">Datenschutz &amp; Grenzen</a>
+        <a href="#faq">Häufige Fragen</a>
+        <a class="btn btn-primary btn-sm" href="upload.html">Unterlagen prüfen lassen</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inhalt">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Fondsunterlagen verständlich gemacht</div>
+          <h1>Verstehen, was Ihre Bank Ihnen empfiehlt.</h1>
+          <p class="lead">Laden Sie Fondsunterlagen und die Empfehlung Ihrer Bank hoch. Fondslupe fasst Kosten, Risiken und Bedingungen in klarer Sprache zusammen – mit Seitenangabe für jede Aussage und konkreten Fragen für Ihr nächstes Bankgespräch.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="upload.html"><i data-icon="upload"></i>Unterlagen hochladen</a>
+            <a class="btn btn-secondary" href="bericht.html">Beispielbericht ansehen</a>
+          </div>
+          <div class="hero-trust">
+            <span><i data-icon="lock"></i>Verschlüsselte Übertragung</span>
+            <span><i data-icon="trash"></i>Automatische Löschung nach 30 Tagen</span>
+            <span><i data-icon="shield"></i>Keine Weitergabe an Banken</span>
+          </div>
+        </div>
+
+        <div class="preview" aria-label="Vorschau eines Analyseberichts">
+          <div class="preview-head">
+            <strong>Musterfonds Global Wachstum</strong>
+            <span class="xs muted">Beispiel</span>
+          </div>
+          <div class="preview-row"><span>Laufende Kosten: 1,85 % oder 1,65 %?</span><span class="chip chip-unklar"><i data-icon="unklar"></i>Unklar</span></div>
+          <div class="preview-row"><span>Anlagedauer passt nicht zum Protokoll</span><span class="chip chip-hoch"><i data-icon="hoch"></i>Abweichung</span></div>
+          <div class="preview-row"><span>Rückgabe kann beschränkt werden</span><span class="chip chip-mittel"><i data-icon="mittel"></i>Beachten</span></div>
+          <div class="preview-row"><span>Kein Rücknahmeabschlag</span><span class="chip chip-niedrig"><i data-icon="niedrig"></i>Unauffällig</span></div>
+          <div class="preview-row"><span>Jahresbericht liegt nicht vor</span><span class="chip chip-fehlt"><i data-icon="fehlt"></i>Fehlt</span></div>
+          <p class="xs muted" style="margin:12px 0 0">Jede Aussage im Bericht ist mit Dokument und Seitenzahl belegt.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="so-gehts" aria-labelledby="so-gehts-titel">
+      <div class="container">
+        <div class="eyebrow">Ablauf</div>
+        <h2 id="so-gehts-titel">So funktioniert’s</h2>
+        <p class="lead" style="margin-bottom:32px">In wenigen Minuten vom Papierstapel zur verständlichen Übersicht.</p>
+        <ol class="steps">
+          <li><h3>Unterlagen hochladen</h3><p>PDF-Dateien oder Fotos von Basisinformationsblatt, Prospekt, Kostenübersicht und Beratungsprotokoll.</p></li>
+          <li><h3>Automatisch prüfen</h3><p>Fondslupe erkennt Dokumenttyp, Fondsname und wichtige Produktdaten. Sie sehen jederzeit, woran gearbeitet wird.</p></li>
+          <li><h3>Bericht lesen</h3><p>Kosten, Risiken und Bedingungen in klarer Sprache – jede Aussage mit Quelle und Erkennungssicherheit.</p></li>
+          <li><h3>Mit der Bank sprechen</h3><p>Nehmen Sie die vorgeschlagenen Fragen mit ins Gespräch – als PDF, Textdatei oder ausgedruckt.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pruefung-titel">
+      <div class="container">
+        <div class="eyebrow">Inhalt des Berichts</div>
+        <h2 id="pruefung-titel">Was Fondslupe für Sie prüft</h2>
+        <div class="grid grid-3" style="margin-top:24px">
+          <div class="card feature"><h3><i data-icon="euro"></i>Kosten</h3><p>Ausgabeaufschlag, laufende Kosten, erfolgsabhängige Gebühren und Zuwendungen an die Bank – erklärt und in Euro eingeordnet.</p></div>
+          <div class="card feature"><h3><i data-icon="hoch"></i>Risiken</h3><p>Verlustrisiko, Schwankungen, Währung, Konzentration und Liquidität – mit Text, Symbol und Farbe gekennzeichnet.</p></div>
+          <div class="card feature"><h3><i data-icon="calendar"></i>Laufzeit und Rückgabe</h3><p>Wie lange Ihr Geld gebunden ist, wann Sie verkaufen können und wann die Rückgabe eingeschränkt werden darf.</p></div>
+          <div class="card feature"><h3><i data-icon="compare"></i>Abgleich mit der Empfehlung</h3><p>Passen Anlagedauer, Risikobereitschaft und Wünsche aus dem Beratungsprotokoll zu den Fondsangaben?</p></div>
+          <div class="card feature"><h3><i data-icon="doc"></i>Quelle für jede Aussage</h3><p>Dokument und Seitenzahl zu jedem Wert. Informationen aus den Unterlagen und Einschätzungen der KI sind klar getrennt.</p></div>
+          <div class="card feature"><h3><i data-icon="question"></i>Fragen an die Bank</h3><p>Konkrete Rückfragen zu Abweichungen, Unklarheiten und fehlenden Unterlagen – zum Mitnehmen ins Gespräch.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="dokumente-titel">
+      <div class="container">
+        <div class="grid grid-2" style="align-items:start">
+          <div>
+            <div class="eyebrow">Unterstützte Unterlagen</div>
+            <h2 id="dokumente-titel">Welche Unterlagen Sie hochladen können</h2>
+            <p class="muted">Je vollständiger die Unterlagen, desto aussagekräftiger der Bericht. Für eine erste Auswertung genügt das Basisinformationsblatt. Für den Abgleich mit der Bankempfehlung benötigen wir zusätzlich das Beratungsprotokoll oder die Geeignetheitserklärung.</p>
+          </div>
+          <ul class="doc-types" aria-label="Unterstützte Dokumenttypen">
+            <li><i data-icon="doc"></i>Basisinformationsblatt (KID)</li>
+            <li><i data-icon="doc"></i>Verkaufsprospekt</li>
+            <li><i data-icon="doc"></i>Fondsvertrag / Anlagebedingungen</li>
+            <li><i data-icon="doc"></i>Kostenübersicht</li>
+            <li><i data-icon="doc"></i>Beratungsprotokoll</li>
+            <li><i data-icon="doc"></i>Geeignetheitserklärung</li>
+            <li><i data-icon="doc"></i>Produktinformationsblatt</li>
+            <li><i data-icon="doc"></i>Schriftliche Bankempfehlung</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="trennung-titel">
+      <div class="container">
+        <div class="grid grid-2" style="align-items:start">
+          <div>
+            <div class="eyebrow">Transparenz</div>
+            <h2 id="trennung-titel">Was in den Unterlagen steht – und was die KI daraus schließt</h2>
+            <p class="muted">Im Bericht sehen Sie immer, woher eine Aussage kommt. Wörtliche Angaben aus Ihren Unterlagen sind grau hinterlegt und mit Seitenzahl versehen. Einschätzungen der KI sind violett hinterlegt und nennen die Textstellen, auf die sie sich stützen.</p>
+            <ul class="list-plain list-check">
+              <li><i data-icon="check"></i><span>Fehlende Angaben werden als <strong>fehlend</strong> markiert – nie geschätzt oder ergänzt.</span></li>
+              <li><i data-icon="check"></i><span>Unklare Stellen werden als <strong>unklar</strong> markiert und in Fragen an die Bank übersetzt.</span></li>
+              <li><i data-icon="check"></i><span>Fondslupe gibt <strong>keine Kauf- oder Verkaufsempfehlung</strong>.</span></li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="evidence">
+              <div class="from-doc">
+                <div class="block-label"><i data-icon="doc"></i>Aus den Unterlagen</div>
+                <blockquote>„Verwaltungsgebühren und sonstige Verwaltungs- oder Betriebskosten: 1,85 % des Werts Ihrer Anlage pro Jahr.“</blockquote>
+                <div class="src-row" style="margin-top:8px"><span class="chip chip-doc"><i data-icon="doc"></i>Basisinformationsblatt, S. 2</span><span class="conf"><span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span>Erkennung: Hoch</span></div>
+              </div>
+              <div class="ki">
+                <div class="block-label"><i data-icon="ki"></i>Einschätzung der KI</div>
+                <p>Die Kostenübersicht der Bank nennt 1,65 %. Welcher Wert für Sie gilt, geht aus den Unterlagen nicht hervor – das sollten Sie bei der Bank erfragen.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-titel">
+      <div class="container prose">
+        <div class="eyebrow">Häufige Fragen</div>
+        <h2 id="faq-titel">Häufige Fragen</h2>
+        <details class="card"><summary><strong>Ersetzt Fondslupe eine Anlageberatung?</strong></summary><p style="margin-top:12px">Nein. Der Bericht hilft Ihnen, Unterlagen zu verstehen und gezielte Fragen zu stellen. Er berücksichtigt nicht Ihre gesamte finanzielle Situation und gibt keine Kauf- oder Verkaufsempfehlung.</p></details>
+        <details class="card"><summary><strong>Was passiert mit meinen Dokumenten?</strong></summary><p style="margin-top:12px">Ihre Dokumente werden verschlüsselt übertragen und gespeichert, ausschließlich für Ihre Analyse verwendet und nach 30 Tagen automatisch gelöscht – auf Wunsch sofort. Sie werden nicht an Banken oder Dritte weitergegeben und nicht zum Training von KI-Modellen genutzt. <a href="sicherheit.html">Mehr zu Datenschutz</a></p></details>
+        <details class="card"><summary><strong>Wie zuverlässig ist die Auswertung?</strong></summary><p style="margin-top:12px">Zu jeder Angabe zeigen wir, wie sicher sie erkannt wurde (hoch, mittel, niedrig) und auf welche Textstelle sie sich stützt. Bei Scans oder Handschrift ist die Erkennung weniger sicher. Prüfen Sie wichtige Angaben immer anhand der verlinkten Originalstelle.</p></details>
+        <details class="card"><summary><strong>Welche Dateien kann ich hochladen?</strong></summary><p style="margin-top:12px">PDF-Dateien sowie Fotos oder Scans im JPG- oder PNG-Format, bis zu 20 MB pro Datei und bis zu 10 Dateien je Analyse.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <p><strong>Fondslupe</strong> <span class="proto-badge">Prototyp · alle Beispieldaten fiktiv</span></p>
+        <p>Die Analyse bietet eine Orientierung und ersetzt keine individuelle Anlageberatung. Fondslupe gibt keine Kauf- oder Verkaufsempfehlungen.</p>
+      </div>
+      <div>
+        <h2>Angebot</h2>
+        <ul><li><a href="upload.html">Unterlagen hochladen</a></li><li><a href="bericht.html">Beispielbericht</a></li><li><a href="index.html#faq">Häufige Fragen</a></li></ul>
+      </div>
+      <div>
+        <h2>Rechtliches</h2>
+        <ul><li><a href="sicherheit.html">Datenschutz &amp; Sicherheit</a></li><li><a href="sicherheit.html#grenzen">Grenzen der Analyse</a></li><li><span>Impressum (Platzhalter)</span></li></ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
