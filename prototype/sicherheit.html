@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datenschutz &amp; Grenzen der Analyse – Fondslupe (Prototyp)</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><span class="brand-mark"><i data-icon="logo"></i></span>Fondslupe <small>Prototyp</small></a>
+      <button class="btn btn-secondary btn-icon nav-toggle" type="button" aria-expanded="false" aria-controls="hauptnavigation" aria-label="Menü"><i data-icon="menu"></i></button>
+      <nav id="hauptnavigation" class="nav" aria-label="Hauptnavigation">
+        <a href="index.html#so-gehts">So funktioniert’s</a>
+        <a href="bericht.html">Beispielbericht</a>
+        <a href="sicherheit.html" aria-current="page">Datenschutz &amp; Grenzen</a>
+        <a href="index.html#faq">Häufige Fragen</a>
+        <a class="btn btn-primary btn-sm" href="upload.html">Unterlagen prüfen lassen</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inhalt" class="container">
+    <div class="page-head prose">
+      <div class="eyebrow">Vertrauen</div>
+      <h1>Datenschutz &amp; Grenzen der Analyse</h1>
+      <p class="lead">Finanzunterlagen sind vertraulich. Hier erklären wir, wie wir mit Ihren Dokumenten umgehen – und was eine automatische Analyse leisten kann und was nicht.</p>
+    </div>
+
+    <section class="section-tight" aria-labelledby="daten-titel">
+      <h2 id="daten-titel">So schützen wir Ihre Unterlagen</h2>
+      <div class="grid grid-2" style="margin-top:16px">
+        <div class="card feature"><h3><i data-icon="lock"></i>Verschlüsselt</h3><p>Übertragung per TLS, Speicherung verschlüsselt. Zugriff nur über Ihr Konto oder einen persönlichen, zeitlich begrenzten Link.</p></div>
+        <div class="card feature"><h3><i data-icon="shield"></i>Verarbeitung in der EU</h3><p>Speicherung und KI-Verarbeitung ausschließlich in Rechenzentren innerhalb der EU, auf Grundlage der DSGVO.</p></div>
+        <div class="card feature"><h3><i data-icon="trash"></i>Automatisch gelöscht</h3><p>Dokumente werden nach 30 Tagen gelöscht, der Bericht nach 12 Monaten – auf Wunsch jederzeit sofort mit einem Klick.</p></div>
+        <div class="card feature"><h3><i data-icon="niedrig"></i>Keine Weitergabe</h3><p>Keine Weitergabe an Banken, Fondsgesellschaften oder Werbepartner. Ihre Dokumente werden nicht zum Training von KI-Modellen verwendet.</p></div>
+      </div>
+      <div class="notice" style="margin-top:16px"><i data-icon="info"></i><p><strong>Tipp:</strong> Sie können Name, Adresse und Kontonummer vor dem Hochladen schwärzen. Für die Analyse werden sie nicht benötigt.</p></div>
+    </section>
+
+    <section class="section-tight prose" id="grenzen" aria-labelledby="grenzen-titel">
+      <h2 id="grenzen-titel">Was die Analyse leistet – und was nicht</h2>
+      <div class="grid grid-2" style="margin-top:16px;max-width:none">
+        <div class="card">
+          <h3 style="font-size:var(--fs-md);display:flex;gap:8px;align-items:center"><i data-icon="niedrig"></i>Das leistet Fondslupe</h3>
+          <ul class="list-plain list-check small">
+            <li><i data-icon="check"></i><span>Erklärt Inhalte Ihrer Unterlagen in einfacher Sprache</span></li>
+            <li><i data-icon="check"></i><span>Belegt jede Angabe mit Dokument und Seitenzahl</span></li>
+            <li><i data-icon="check"></i><span>Markiert Abweichungen, Unklarheiten und Lücken</span></li>
+            <li><i data-icon="check"></i><span>Schlägt Fragen für Ihr Bankgespräch vor</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="font-size:var(--fs-md);display:flex;gap:8px;align-items:center"><i data-icon="hoch"></i>Das leistet Fondslupe nicht</h3>
+          <ul class="list-plain list-check small">
+            <li><i data-icon="x"></i><span>Keine Kauf-, Halte- oder Verkaufsempfehlung</span></li>
+            <li><i data-icon="x"></i><span>Keine individuelle Anlage-, Steuer- oder Rechtsberatung</span></li>
+            <li><i data-icon="x"></i><span>Keine Prognose der künftigen Wertentwicklung</span></li>
+            <li><i data-icon="x"></i><span>Kein Ergänzen fehlender Angaben aus Schätzungen</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-tight prose" aria-labelledby="ki-titel">
+      <h2 id="ki-titel">Wie die KI arbeitet</h2>
+      <p>Die Analyse besteht aus zwei klar getrennten Teilen:</p>
+      <div class="evidence" style="margin-bottom:16px">
+        <div class="from-doc"><div class="block-label"><i data-icon="doc"></i>Aus den Unterlagen</div><p class="small" style="margin:0">Wörtliche Textstellen und Zahlen, die direkt aus Ihren Dokumenten gelesen werden – immer mit Dokumentname und Seitenzahl.</p></div>
+        <div class="ki"><div class="block-label"><i data-icon="ki"></i>Einschätzung der KI</div><p>Erklärungen, Vergleiche und Einstufungen, die die KI aus diesen Textstellen ableitet. Jede Einschätzung nennt die Textstellen, auf die sie sich stützt.</p></div>
+      </div>
+      <h3>Erkennungssicherheit</h3>
+      <p>Zu jeder Angabe zeigen wir, wie sicher sie erkannt wurde:</p>
+      <ul class="list-plain">
+        <li style="margin-bottom:8px"><span class="conf"><span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span>Erkennung: Hoch</span> – Text eindeutig lesbar, Wert und Bedeutung klar.</li>
+        <li style="margin-bottom:8px"><span class="conf"><span class="bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span>Erkennung: Mittel</span> – z. B. gescannte Seite, Fachsprache oder Wert als Höchstgrenze formuliert.</li>
+        <li><span class="conf"><span class="bars" aria-hidden="true"><i class="on"></i><i></i><i></i></span>Erkennung: Niedrig</span> – z. B. Handschrift, schlechte Bildqualität oder widersprüchliche Stellen. Bitte im Original prüfen.</li>
+      </ul>
+    </section>
+
+    <section class="section-tight prose" aria-labelledby="hilfe-titel" style="padding-bottom:64px">
+      <h2 id="hilfe-titel">Wo Sie persönliche Beratung erhalten</h2>
+      <p>Für eine individuelle Einschätzung wenden Sie sich an Ihre Bank, an eine unabhängige Honorar-Anlageberatung oder an die Verbraucherzentrale in Ihrem Bundesland.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p style="margin:0"><span class="proto-badge">Prototyp</span> Die beschriebenen Schutzmaßnahmen sind Zielvorgaben für das fertige Produkt (siehe Konzept, Annahmen).</p>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
