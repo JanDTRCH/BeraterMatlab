@@ -23,6 +23,19 @@ Danach <http://localhost:8000> aufrufen.
 
 **Empfohlener Rundgang:** Startseite → „Unterlagen hochladen“ → „Mit Beispielunterlagen ausprobieren“ → Einwilligung bestätigen → „Analyse starten“ → „Bericht ansehen“ → im Bericht auf eine Quelle (z. B. „Basisinformationsblatt, S. 2“) klicken.
 
+## Deployment (z. B. Railway)
+
+Das Repository enthält ein `Dockerfile`, das den Ordner `prototype/` mit dem Webserver [Caddy](https://caddyserver.com) ausliefert. Caddy lauscht auf der Umgebungsvariable `PORT`, die Railway automatisch setzt (lokal Standard: 8080). Konfiguration in `Caddyfile`, mit Sicherheits-Headern und `noindex`, weil der Prototyp fiktive Daten zeigt.
+
+**Railway:** Neues Projekt → „Deploy from GitHub repo“ → dieses Repository wählen. Railway erkennt das `Dockerfile` selbst; es sind keine Variablen nötig. Danach unter *Settings → Networking* „Generate Domain“ klicken.
+
+**Lokal testen:**
+
+```bash
+docker build -t fondslupe .
+docker run --rm -p 8080:8080 fondslupe
+```
+
 ## Seiten
 
 - `index.html` – Startseite
