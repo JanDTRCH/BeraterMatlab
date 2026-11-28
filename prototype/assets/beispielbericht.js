@@ -16,20 +16,20 @@ window.BERICHT = {
   bank: 'Musterbank (fiktiv)',
 
   dokumente: {
-    D1: { name: 'Basisinformationsblatt (KID)', datei: 'KID_Musterfonds_Global_Wachstum.pdf', seiten: 3, stand: '15.02.2026', sicherheit: 'hoch' },
-    D2: { name: 'Verkaufsprospekt mit Anlagebedingungen', datei: 'Verkaufsprospekt_Musterfonds.pdf', seiten: 60, seitenErwartet: 112, stand: '01.01.2026', sicherheit: 'hoch' },
-    D3: { name: 'Kostenübersicht (Ex-ante-Kosteninformation)', datei: 'Kosteninformation_Musterbank.pdf', seiten: 2, stand: '03.11.2026', sicherheit: 'hoch' },
-    D4: { name: 'Beratungsprotokoll / Geeignetheitserklärung', datei: 'Geeignetheitserklaerung_Scan.pdf', seiten: 4, stand: '03.11.2026', sicherheit: 'mittel', hinweis: 'Scan – Text per Texterkennung gelesen' },
-    D5: { name: 'Schriftliche Bankempfehlung', datei: 'Anschreiben_Empfehlung.pdf', seiten: 1, stand: '04.11.2026', sicherheit: 'hoch' }
+    D1: { typ: 'kid', kurz: 'Basisinformationsblatt', name: 'Basisinformationsblatt (KID)', datei: 'KID_Musterfonds_Global_Wachstum.pdf', seiten: 3, stand: '15.02.2026', sicherheit: 'hoch' },
+    D2: { typ: 'prospekt', kurz: 'Verkaufsprospekt', name: 'Verkaufsprospekt mit Anlagebedingungen', datei: 'Verkaufsprospekt_Musterfonds.pdf', seiten: 60, seitenErwartet: 112, stand: '01.01.2026', sicherheit: 'hoch' },
+    D3: { typ: 'kosten', kurz: 'Kostenübersicht', name: 'Kostenübersicht (Ex-ante-Kosteninformation)', datei: 'Kosteninformation_Musterbank.pdf', seiten: 2, stand: '03.11.2026', sicherheit: 'hoch' },
+    D4: { typ: 'protokoll', kurz: 'Beratungsprotokoll', name: 'Beratungsprotokoll / Geeignetheitserklärung', datei: 'Geeignetheitserklaerung_Scan.pdf', seiten: 4, stand: '03.11.2026', sicherheit: 'mittel', hinweis: 'Scan – Text per Texterkennung gelesen' },
+    D5: { typ: 'empfehlung', kurz: 'Bankempfehlung', name: 'Schriftliche Bankempfehlung', datei: 'Anschreiben_Empfehlung.pdf', seiten: 1, stand: '04.11.2026', sicherheit: 'hoch' }
   },
 
   zusammenfassung: {
     kurz: [
-      'Es handelt sich um einen <strong>Aktienfonds</strong>, der weltweit in Unternehmen anlegt, überwiegend in den USA. Der Wert Ihrer Anlage kann deutlich schwanken.',
-      'Der Fonds hat <strong>keine feste Laufzeit</strong>. Die Fondsgesellschaft empfiehlt, mindestens <strong>7 Jahre</strong> investiert zu bleiben.',
-      'Beim Kauf fällt ein <strong>Ausgabeaufschlag</strong> an (laut Bank 3 %), dazu kommen jedes Jahr <strong>laufende Kosten</strong> von rund 1,7 – 1,9 %. Die beiden Unterlagen nennen hier unterschiedliche Werte.',
-      'Im Abgleich mit Ihrem Beratungsprotokoll fallen <strong>drei Abweichungen</strong> auf: Anlagedauer, Verlusttragfähigkeit und Nachhaltigkeitswunsch.',
-      'Einige Unterlagen sind <strong>unvollständig</strong> (Verkaufsprospekt nur bis Seite 60, kein Jahresbericht).'
+      'Es handelt sich um einen **Aktienfonds**, der weltweit in Unternehmen anlegt, überwiegend in den USA. Der Wert Ihrer Anlage kann deutlich schwanken.',
+      'Der Fonds hat **keine feste Laufzeit**. Die Fondsgesellschaft empfiehlt, mindestens **7 Jahre** investiert zu bleiben.',
+      'Beim Kauf fällt ein **Ausgabeaufschlag** an (laut Bank 3 %), dazu kommen jedes Jahr **laufende Kosten** von rund 1,7 – 1,9 %. Die beiden Unterlagen nennen hier unterschiedliche Werte.',
+      'Im Abgleich mit Ihrem Beratungsprotokoll fallen **drei Abweichungen** auf: Anlagedauer, Verlusttragfähigkeit und Nachhaltigkeitswunsch.',
+      'Einige Unterlagen sind **unvollständig** (Verkaufsprospekt nur bis Seite 60, kein Jahresbericht).'
     ],
     kiHinweis: 'Diese Zusammenfassung wurde von der KI aus den unten belegten Textstellen erstellt. Sie enthält keine Kauf- oder Verkaufsempfehlung.',
     fakten: [
@@ -106,7 +106,7 @@ window.BERICHT = {
 
   risiken: {
     einleitung: 'Hier sehen Sie, welche Risiken die Unterlagen nennen. Die Einstufung „hoch / mittel / gering“ ist eine Einschätzung der KI für dieses Angebot – sie beruht auf den genannten Textstellen.',
-    sri: { wert: 4, beleg: { dok: 'D1', seite: 1 } },
+    sri: { wert: 4, beleg: { dok: 'D1', seite: 1 }, belegId: 'b-kid-sri' },
     befunde: [
       {
         id: 'r1', titel: 'Verlustrisiko', stufe: 'hoch',

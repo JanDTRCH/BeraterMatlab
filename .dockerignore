@@ -1,3 +1,5 @@
 .git
 docs
 README.md
+**/node_modules
+server/test

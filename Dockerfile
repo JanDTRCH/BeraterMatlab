@@ -1,11 +1,16 @@
-# Statische Auslieferung des Prototyps mit Caddy.
-# Railway setzt die Variable PORT; lokal wird 8080 verwendet.
-FROM caddy:2-alpine
+# Fondslupe: Node-Server liefert die Website (prototype/) aus und stellt die
+# Analyse-API bereit. Railway setzt PORT; lokal wird 8080 verwendet.
+FROM node:22-alpine
 
-COPY Caddyfile /etc/caddy/Caddyfile
-COPY prototype/ /srv/
+ENV NODE_ENV=production PORT=8080 WEB_ROOT=/app/prototype
+WORKDIR /app/server
 
-ENV PORT=8080
+COPY server/package.json server/package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY server/src ./src
+COPY prototype /app/prototype
+
+USER node
 EXPOSE 8080
-
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+CMD ["node", "src/server.js"]

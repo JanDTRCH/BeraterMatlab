@@ -1,0 +1,22 @@
+{
+  "name": "fondslupe-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Server für Fondslupe: Upload, PDF-Textauslese, Analyse mit Claude, Belegprüfung",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
+    "express": "^5.3.0",
+    "multer": "^2.5.0",
+    "unpdf": "^2.2.3",
+    "zod": "^4.6.7"
+  }
+}

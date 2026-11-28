@@ -2,7 +2,8 @@
 
 > **Arbeitstitel:** „Fondslupe“ (Name und Markenrecht noch zu prüfen)
 > **Stand:** 25.11.2026 · Konzept und erster Prototyp
-> **Prototyp:** [`/prototype`](../prototype) – statische, klickbare Website mit fiktiven Beispieldaten
+> **Prototyp:** [`/prototype`](../prototype) – klickbare Website mit fiktivem Beispielbericht
+> **Umsetzungsstand (28.11.2026):** Die echte PDF-Analyse mit Claude ist umgesetzt ([`/server`](../server), siehe README). Abweichend von den Annahmen A10/A11 werden die Unterlagen zur Auswertung an Anthropic übermittelt, Dateien nur im Arbeitsspeicher verarbeitet und sofort gelöscht, Berichte nach 24 Stunden.
 
 ---
 

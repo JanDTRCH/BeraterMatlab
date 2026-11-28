@@ -11,7 +11,7 @@
 
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="index.html"><span class="brand-mark"><i data-icon="logo"></i></span>Fondslupe <small>Prototyp</small></a>
+      <a class="brand" href="index.html"><span class="brand-mark"><i data-icon="logo"></i></span>Fondslupe <small>Testversion</small></a>
       <button class="btn btn-secondary btn-icon nav-toggle" type="button" aria-expanded="false" aria-controls="hauptnavigation" aria-label="Menü"><i data-icon="menu"></i></button>
       <nav id="hauptnavigation" class="nav" aria-label="Hauptnavigation">
         <a href="index.html#so-gehts">So funktioniert’s</a>
@@ -36,33 +36,46 @@
 
     <div class="upload-layout">
       <div>
+        <div class="notice" id="ki-status" hidden style="margin-bottom:16px"><i data-icon="info"></i><div><p></p></div></div>
         <div class="dropzone" id="dropzone">
           <div class="dz-icon"><i data-icon="upload"></i></div>
           <h2>Dateien hierher ziehen</h2>
-          <p>oder vom Gerät auswählen · PDF, JPG oder PNG · bis 20 MB pro Datei · bis zu 10 Dateien</p>
+          <p>oder vom Gerät auswählen · PDF, JPG oder PNG · bis 20 MB pro Datei, zusammen bis 25 MB · bis zu 10 Dateien</p>
           <div class="actions">
             <label class="btn btn-primary" for="file-input"><i data-icon="doc"></i>Dateien auswählen</label>
-            <button type="button" class="btn btn-secondary" id="sample-btn">Mit Beispielunterlagen ausprobieren</button>
+            <a class="btn btn-secondary" id="sample-btn" href="analyse.html?demo=1">Beispielanalyse ansehen</a>
           </div>
           <input class="sr-only" type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png">
         </div>
 
-        <p class="xs muted" style="margin-top:12px;display:flex;gap:8px;align-items:flex-start"><i data-icon="lock"></i><span>Prototyp: Ihre Dateien verlassen Ihren Browser nicht. Es werden nur Dateiname und Größe angezeigt. Im fertigen Produkt erfolgt die Übertragung verschlüsselt.</span></p>
+        <p class="xs muted" style="margin-top:12px;display:flex;gap:8px;align-items:flex-start"><i data-icon="lock"></i><span>Ihre Dateien werden verschlüsselt übertragen, nur im Arbeitsspeicher verarbeitet und direkt nach der Analyse gelöscht. Für die Auswertung wird der Inhalt an den KI-Dienst Anthropic (Claude) übermittelt. <a href="sicherheit.html">Mehr zum Datenschutz</a></span></p>
 
         <h2 class="sr-only" id="liste-titel">Ausgewählte Unterlagen</h2>
         <ul class="file-list" id="file-list" aria-labelledby="liste-titel" aria-live="polite"></ul>
         <p class="field-error" id="files-error" hidden><i data-icon="mittel"></i><span></span></p>
 
+        <div id="code-field" hidden style="margin-top:24px">
+          <label for="zugangscode" style="display:block;font-weight:600;margin-bottom:4px">Zugangscode</label>
+          <input type="password" id="zugangscode" autocomplete="off" style="font:inherit;min-height:44px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);width:min(320px,100%)">
+          <p class="xs muted" style="margin:4px 0 0">Diese Testversion ist nur mit Zugangscode nutzbar.</p>
+          <p class="field-error" id="code-error" hidden><i data-icon="mittel"></i><span>Bitte geben Sie den Zugangscode ein.</span></p>
+        </div>
+
         <label class="consent" for="consent">
           <input type="checkbox" id="consent">
-          <span>Ich bin berechtigt, diese Unterlagen hochzuladen, und bin einverstanden, dass sie ausschließlich zur Erstellung meines Berichts verarbeitet werden. Ich habe verstanden, dass der Bericht eine Orientierung bietet und keine Anlageberatung ersetzt. <a href="sicherheit.html">Datenschutzhinweise</a></span>
+          <span>Ich bin berechtigt, diese Unterlagen hochzuladen, und bin einverstanden, dass sie ausschließlich zur Erstellung meines Berichts verarbeitet und dafür an den KI-Dienst Anthropic übermittelt werden. Ich habe verstanden, dass der Bericht eine Orientierung bietet und keine Anlageberatung ersetzt. <a href="sicherheit.html">Datenschutzhinweise</a></span>
         </label>
         <p class="field-error" id="consent-error" hidden><i data-icon="mittel"></i><span>Bitte bestätigen Sie die Einwilligung, damit wir Ihre Unterlagen analysieren können.</span></p>
 
         <div class="form-actions">
           <button type="button" class="btn btn-primary" id="start-btn">Analyse starten<i data-icon="arrow"></i></button>
-          <span class="small muted" id="start-hint">Dauer: etwa 2 bis 4 Minuten</span>
+          <span class="small muted" id="start-hint">Dauer: etwa 2 bis 5 Minuten</span>
         </div>
+        <div id="upload-progress" hidden style="margin-top:12px;max-width:420px">
+          <div class="overall-label"><span>Dateien werden übertragen …</span><span id="upload-pct">0 %</span></div>
+          <div class="progress" role="progressbar" aria-label="Übertragung" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="upload-bar"></span></div>
+        </div>
+        <p class="field-error" id="submit-error" hidden role="alert"><i data-icon="mittel"></i><span></span></p>
       </div>
 
       <aside aria-label="Hinweise zum Upload">
@@ -81,10 +94,10 @@
         <div class="card">
           <h2 style="font-size:var(--fs-md)">So schützen wir Ihre Unterlagen</h2>
           <ul class="list-plain list-check small">
-            <li><i data-icon="lock"></i><span>Verschlüsselte Übertragung und Speicherung</span></li>
-            <li><i data-icon="shield"></i><span>Verarbeitung nur in Rechenzentren in der EU</span></li>
-            <li><i data-icon="trash"></i><span>Löschung nach 30 Tagen oder sofort auf Wunsch</span></li>
-            <li><i data-icon="niedrig"></i><span>Keine Weitergabe, kein KI-Training mit Ihren Daten</span></li>
+            <li><i data-icon="lock"></i><span>Verschlüsselte Übertragung (HTTPS)</span></li>
+            <li><i data-icon="trash"></i><span>Dateien werden nur im Arbeitsspeicher verarbeitet und direkt nach der Analyse gelöscht</span></li>
+            <li><i data-icon="calendar"></i><span>Bericht wird nach 24 Stunden gelöscht – oder sofort auf Wunsch</span></li>
+            <li><i data-icon="shield"></i><span>Auswertung durch Claude (Anthropic); keine Weitergabe an Banken oder Werbepartner</span></li>
           </ul>
         </div>
       </aside>
