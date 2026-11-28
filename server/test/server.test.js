@@ -26,7 +26,7 @@ function form(files, fields = {}) {
   return fd;
 }
 
-before(() => startServer({ ANTHROPIC_API_KEY: 'sk-ant-test-ungueltig', ZUGANGSCODE: 'geheim123' }));
+before(() => startServer({ ANTHROPIC_API_KEY: 'sk-ant-test-ungueltig', ZUGANGSCODE: 'geheim123', ANALYSEN_PRO_IP_PRO_STUNDE: '2' }));
 after(() => proc && proc.kill());
 
 test('Website und Sicherheits-Header', async () => {
@@ -79,4 +79,47 @@ test('Upload: Auftrag läuft durch Textauslese und meldet API-Fehler verständli
   assert.equal((await fetch(`${BASE}/api/analysen/${id}/bericht`)).status, 409);
   assert.equal((await fetch(`${BASE}/api/analysen/${id}`, { method: 'DELETE' })).status, 204);
   assert.equal((await fetch(`${BASE}/api/analysen/${id}`)).status, 404);
+});
+
+async function warteAufEnde(id) {
+  let s;
+  for (let i = 0; i < 100; i++) {
+    s = await (await fetch(`${BASE}/api/analysen/${id}`)).json();
+    if (s.status !== 'laeuft') return s;
+    await new Promise((res) => setTimeout(res, 200));
+  }
+  return s;
+}
+
+test('Honeypot: ausgefülltes unsichtbares Feld wird abgelehnt', async () => {
+  const pdf = fs.readFileSync(path.join(here, 'fixtures/KID_Testfonds.pdf'));
+  const r = await fetch(BASE + '/api/analysen', { method: 'POST', body: form([['a.pdf', pdf, 'application/pdf']], { einwilligung: 'ja', zugangscode: 'geheim123', website: 'http://spam.example' }) });
+  assert.equal(r.status, 400);
+});
+
+test('Kein Fondsdokument: wird vor dem KI-Aufruf abgelehnt (kostenlos)', async () => {
+  const pdf = fs.readFileSync(path.join(here, 'fixtures/Kochrezept_Test.pdf'));
+  const r = await fetch(BASE + '/api/analysen', { method: 'POST', body: form([['rezept.pdf', pdf, 'application/pdf']], { einwilligung: 'ja', zugangscode: 'geheim123', typen: '["sonstiges"]' }) });
+  assert.equal(r.status, 202);
+  const s = await warteAufEnde((await r.json()).id);
+  assert.equal(s.status, 'fehler');
+  assert.match(s.fehler, /keine Angaben zu einer Geldanlage/);
+  assert.equal(s.schritte.find((x) => x.id === 'ki').status, 'wartet', 'KI wurde nicht aufgerufen');
+});
+
+test('Stundengrenze je IP greift', async () => {
+  const pdf = fs.readFileSync(path.join(here, 'fixtures/KID_Testfonds.pdf'));
+  const r = await fetch(BASE + '/api/analysen', { method: 'POST', body: form([['a.pdf', pdf, 'application/pdf']], { einwilligung: 'ja', zugangscode: 'geheim123' }) });
+  assert.equal(r.status, 429);
+  assert.match((await r.json()).fehler, /warten/);
+});
+
+test('Zugangscode: nach 5 Fehlversuchen 15 Minuten gesperrt', async () => {
+  const pdf = fs.readFileSync(path.join(here, 'fixtures/KID_Testfonds.pdf'));
+  let last;
+  for (let i = 0; i < 6; i++) {
+    last = await fetch(BASE + '/api/analysen', { method: 'POST', body: form([['a.pdf', pdf, 'application/pdf']], { einwilligung: 'ja', zugangscode: 'falsch' + i }) });
+  }
+  assert.equal(last.status, 429);
+  assert.match((await last.json()).fehler, /Zu viele falsche Zugangscodes/);
 });

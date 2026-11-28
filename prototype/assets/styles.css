@@ -686,3 +686,5 @@ table.data .src-btn { white-space: normal; text-align: left; }
 .toc a, .toc ol { position: relative; }
 .status-step[data-state="error"] .st-icon { background: var(--hoch-bg); border-color: var(--hoch-line); color: var(--hoch-ink); }
 .status-step .st-hint { margin-top: 4px; }
+/* Honeypot gegen Bots: für Menschen unsichtbar, nicht fokussierbar */
+.hp { position: absolute !important; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }

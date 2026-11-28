@@ -5,12 +5,20 @@ import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { AnalyseSchema } from './schema.js';
 
-export const MODEL = process.env.CLAUDE_MODEL || 'claude-opus-5-5';
+// Standard: Claude Haiku 5.5 – günstig (Cent-Beträge pro Analyse). Über CLAUDE_MODEL
+// lässt sich z. B. claude-sonnet-5-5 oder claude-opus-5-5 einstellen.
+export const MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-5-5';
+// "high" wird für Wissensarbeit mit strengen Regeln empfohlen.
 const EFFORT = process.env.CLAUDE_EFFORT || 'high';
+// Serverseitiger Fallback bei Ablehnung gibt es nur für diese Modelle
+// (nicht für Haiku 5.5: dort ist er wirkungslos bzw. wird abgelehnt).
+const MIT_FALLBACK = ['claude-opus-5-5', 'claude-opus-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-fable-5-2'];
 
 export function kiVerfuegbar() {
   return Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 }
+
+export const MAX_AUSGABE_TOKENS = Number(process.env.MAX_AUSGABE_TOKENS || 48000);
 
 let client;
 function getClient() {
@@ -19,7 +27,12 @@ function getClient() {
 }
 
 export class AnalyseFehler extends Error {
-  constructor(nutzerText, intern) { super(intern || nutzerText); this.nutzerText = nutzerText; }
+  constructor(nutzerText, intern, message) {
+    super(intern || nutzerText);
+    this.nutzerText = nutzerText;
+    // Auch fehlgeschlagene Antworten kosten Geld – Verbrauch für das Tagesbudget mitgeben
+    if (message) { this.usage = message.usage; this.model = message.model; }
+  }
 }
 
 const SYSTEM = `Du analysierst Unterlagen zu einem Investmentfonds-Angebot für Privatanleger in Deutschland, die keine vertieften Finanzkenntnisse haben. Typische Unterlagen: Basisinformationsblatt (KID/PRIIP), Verkaufsprospekt und Anlagebedingungen, Ex-ante-Kosteninformation der Bank, Beratungsprotokoll oder Geeignetheitserklärung, schriftliche Empfehlung der Bank.
@@ -78,16 +91,19 @@ export async function analysiere(docs, onProgress, signal) {
   let zeichen = 0;
   let message;
   try {
-    const stream = getClient().beta.messages.stream({
+    const params = {
       model: MODEL,
-      max_tokens: 64000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
+      max_tokens: MAX_AUSGABE_TOKENS, // begrenzt auch die Kosten pro Analyse
       thinking: { type: 'adaptive' },
       output_config: { effort: EFFORT, format },
       system: SYSTEM,
       messages: [{ role: 'user', content }]
-    }, { signal });
+    };
+    if (MIT_FALLBACK.includes(MODEL)) {
+      params.betas = ['server-side-fallback-2026-07-01'];
+      params.fallbacks = 'default';
+    }
+    const stream = getClient().beta.messages.stream(params, { signal });
     stream.on('text', (t) => { zeichen += t.length; onProgress?.({ zeichen }); });
     message = await stream.finalMessage();
   } catch (err) {
@@ -96,17 +112,17 @@ export async function analysiere(docs, onProgress, signal) {
   }
 
   if (message.stop_reason === 'refusal') {
-    throw new AnalyseFehler('Die KI hat die Analyse dieser Unterlagen abgelehnt. Bitte prüfen Sie, ob es sich um Fondsunterlagen handelt.', `refusal: ${message.stop_details?.category}`);
+    throw new AnalyseFehler('Die KI hat die Analyse dieser Unterlagen abgelehnt. Bitte prüfen Sie, ob es sich um Fondsunterlagen handelt.', `refusal: ${message.stop_details?.category}`, message);
   }
   if (message.stop_reason === 'max_tokens') {
-    throw new AnalyseFehler('Die Unterlagen sind zu umfangreich für eine Analyse in einem Durchgang. Bitte laden Sie weniger oder kürzere Dokumente hoch.', 'max_tokens');
+    throw new AnalyseFehler('Die Unterlagen sind zu umfangreich für eine Analyse in einem Durchgang. Bitte laden Sie weniger oder kürzere Dokumente hoch.', 'max_tokens', message);
   }
   const text = message.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
   let data;
   try {
     data = format.parse(text);
   } catch (err) {
-    throw new AnalyseFehler('Die Antwort der KI war unvollständig. Bitte starten Sie die Analyse erneut.', 'parse: ' + err.message);
+    throw new AnalyseFehler('Die Antwort der KI war unvollständig. Bitte starten Sie die Analyse erneut.', 'parse: ' + err.message, message);
   }
   return { data, usage: message.usage, model: message.model };
 }

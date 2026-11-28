@@ -27,7 +27,7 @@ Upload (PDF/JPG/PNG)
 
 - **Kein Agent**, sondern eine feste Abfolge: Auslesen und Prüfen übernimmt normaler Code, das Verstehen und Erklären Claude.
 - Textseiten werden Claude als Text mit Seitenmarkierungen übergeben, Scans und Fotos zusätzlich als PDF bzw. Bild (Claude liest sie per Bilderkennung).
-- Modell: `claude-opus-5-5` mit adaptivem Denken, Effort `high`, serverseitigem Fallback bei Ablehnung.
+- Modell: standardmäßig **`claude-haiku-5-5`** (Cent-Beträge pro Analyse) mit adaptivem Denken und Effort `high`; per `CLAUDE_MODEL` auf `claude-sonnet-5-5` oder `claude-opus-5-5` umstellbar (dann mit serverseitigem Fallback bei Ablehnung).
 - **Datenschutz:** Dateien werden nicht auf Festplatte gespeichert, sondern nur im Arbeitsspeicher verarbeitet und nach der Analyse verworfen. Berichte werden nach 24 Stunden gelöscht (oder sofort per Button). Ein Neustart des Servers löscht alle Berichte. Der Inhalt der Unterlagen wird zur Auswertung an Anthropic übermittelt.
 
 Code: [`server/src/claude.js`](server/src/claude.js) (Anweisungen und Aufruf), [`server/src/schema.js`](server/src/schema.js) (Ausgabeformat), [`server/src/verify.js`](server/src/verify.js) (Belegprüfung), [`server/src/jobs.js`](server/src/jobs.js) (Ablauf), [`server/src/server.js`](server/src/server.js) (API, Website, Missbrauchsschutz).
@@ -50,22 +50,46 @@ Fiktive Testunterlagen (Basisinformationsblatt, Kosteninformation, gescanntes Be
 
 Das `Dockerfile` baut den Node-Server; Railway erkennt es automatisch.
 
-**Variablen** (Railway → Service → *Variables*):
+### Schritt für Schritt
 
-| Variable | Pflicht | Bedeutung |
+1. **Eigenen API-Schlüssel nur für dieses Projekt anlegen** – in der [Claude Console](https://platform.claude.com) am besten in einem eigenen Workspace, damit Kosten getrennt sichtbar sind.
+2. **Ausgabengrenze setzen** – in der Console für diesen Workspace ein monatliches Limit, z. B. 10 USD. Das ist die harte Grenze, die auch bei einem Fehler im Server greift.
+3. **Variablen in Railway setzen** (Service → *Variables*): `ANTHROPIC_API_KEY`, `ZUGANGSCODE` und für die Testphase z. B. `TAGESBUDGET_USD=1`.
+4. **Deployen** und die Startmeldung im Railway-Log prüfen: Sie zeigt Modell, Zugangscode, Turnstile und Tagesbudget.
+5. **Mit den fiktiven Test-PDFs testen** (`server/test/fixtures/`) und im Log die Kosten je Analyse ablesen.
+6. **Optional: Cloudflare Turnstile** einrichten (kostenlos): im Cloudflare-Dashboard ein Turnstile-Widget für die Railway-Domain anlegen und `TURNSTILE_SITE_KEY` und `TURNSTILE_SECRET_KEY` setzen. Sinnvoll, sobald die Seite ohne Zugangscode öffentlich werden soll.
+7. **Nach einer Woche** Kosten und Logs ansehen und die Grenzen anpassen.
+
+### Schutz vor Missbrauch und Kosten
+
+Jede Schicht greift, bevor die nächste etwas kostet:
+
+| Schicht | Wirkung | Einstellung |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | ja | API-Schlüssel aus der Claude Console |
-| `ZUGANGSCODE` | dringend empfohlen | Ohne Code kann jede Person mit dem Link Analysen auf Ihre Kosten starten |
-| `PORT` | – | setzt Railway selbst (Domain auf diesen Port zeigen lassen, z. B. 8080) |
-| `ANALYSEN_PRO_TAG` | – | Obergrenze für alle Nutzer zusammen (Standard 50) |
-| `ANALYSEN_PRO_IP_PRO_TAG` | – | Obergrenze je IP-Adresse (Standard 5) |
-| `MAX_PARALLEL` | – | gleichzeitig laufende Analysen (Standard 2) |
-| `MAX_UPLOAD_MB` | – | Gesamtgröße pro Analyse (Standard 25) |
-| `MAX_SEITEN` | – | Seiten pro Analyse (Standard 500) |
-| `BERICHT_TTL_STUNDEN` | – | Aufbewahrung der Berichte (Standard 24) |
-| `CLAUDE_MODEL`, `CLAUDE_EFFORT` | – | Modell und Effort (Standard `claude-opus-5-5`, `high`) |
+| Zugangscode | Nur Personen mit Code können Analysen starten; nach 5 Fehlversuchen 15 Min. Sperre je IP | `ZUGANGSCODE` |
+| Honeypot-Feld | Unsichtbares Formularfeld, das nur Bots ausfüllen | immer aktiv |
+| Cloudflare Turnstile | Bot-Prüfung, meist ohne Rätsel | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` (optional) |
+| Dateiprüfung | Nur echte PDF/JPG/PNG, max. 20 MB je Datei, 25 MB gesamt, 10 Dateien, 200 Seiten | `MAX_UPLOAD_MB`, `MAX_SEITEN` |
+| Inhaltsprüfung | Unterlagen ohne Bezug zu Geldanlage werden vor dem KI-Aufruf abgelehnt (kostenlos) | immer aktiv |
+| Größenbremse | Max. ca. 150.000 Eingabe- und 48.000 Ausgabe-Tokens je Analyse | `MAX_EINGABE_TOKENS`, `MAX_AUSGABE_TOKENS` |
+| Grenzen je IP | Standard 2 Analysen pro Stunde, 5 pro Tag | `ANALYSEN_PRO_IP_PRO_STUNDE`, `ANALYSEN_PRO_IP_PRO_TAG` |
+| Grenzen gesamt | Standard 50 Analysen pro Tag, 2 gleichzeitig | `ANALYSEN_PRO_TAG`, `MAX_PARALLEL` |
+| Tagesbudget | Server zählt die Kosten mit und nimmt nach Erreichen keine Analysen mehr an (Standard 3 USD/Tag) | `TAGESBUDGET_USD` |
+| Ausgabengrenze in der Claude Console | Harte Obergrenze beim Anbieter | in der Console |
 
-**Kosten:** Abgerechnet wird pro Token (Claude Opus 5.5: 4 $ je Mio. Eingabe-, 20 $ je Mio. Ausgabe-Token). Den größten Teil macht der ausführliche Bericht samt Denkprozess aus. Grobe, noch nicht gemessene Schätzung pro Analyse: wenige Seiten (KID + Kosteninformation) etwa 0,30–0,80 €, mit vollständigem Verkaufsprospekt (100+ Seiten) etwa 1–2 €. Setzen Sie in der Claude Console ein Ausgabenlimit; die Server-Logs zeigen die verbrauchten Token je Analyse.
+Die Zähler liegen im Arbeitsspeicher und werden bei einem Neustart zurückgesetzt – deshalb ist die Ausgabengrenze in der Console die letzte, verlässliche Sicherung.
+
+### Weitere Variablen
+
+| Variable | Bedeutung |
+|---|---|
+| `PORT` | setzt Railway selbst (Domain auf diesen Port zeigen lassen, z. B. 8080) |
+| `BERICHT_TTL_STUNDEN` | Aufbewahrung der Berichte (Standard 24) |
+| `CLAUDE_MODEL`, `CLAUDE_EFFORT` | Modell und Effort (Standard `claude-haiku-5-5`, `high`) |
+
+### Kosten
+
+Abgerechnet wird pro Token. Claude Haiku 5.5: 0,10 $ je Mio. Eingabe- und 0,50 $ je Mio. Ausgabe-Tokens; liegt die Eingabe über 100.000 Tokens, gilt der höhere Tarif von 0,50 $ / 2,50 $. Grobe Schätzung: **etwa 1–3 Cent** für Basisinformationsblatt, Kostenübersicht und Beratungsprotokoll; mit großem Verkaufsprospekt bis etwa 15 Cent. Durch die Größenbremsen höchstens etwa 0,20 $ pro Analyse. Die tatsächlichen Kosten stehen je Analyse im Server-Log.
 
 ## Grenzen der Testversion
 

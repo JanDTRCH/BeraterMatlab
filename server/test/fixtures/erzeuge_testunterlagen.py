@@ -9,6 +9,7 @@ Erzeugt im selben Ordner:
 - KID_Testfonds.pdf             3 Seiten mit Textebene
 - Kosteninformation_Test.pdf    2 Seiten mit Textebene
 - Beratungsprotokoll_Scan.pdf   2 Seiten, nur Bild (wie ein Scan, keine Textebene)
+- Kochrezept_Test.pdf           kein Fondsdokument (muss abgelehnt werden)
 """
 import io
 import os
@@ -184,4 +185,10 @@ if __name__ == "__main__":
     write_pages("KID_Testfonds.pdf", KID)
     write_pages("Kosteninformation_Test.pdf", KOSTEN)
     write_scan("Beratungsprotokoll_Scan.pdf", PROTOKOLL)
+    # Kein Fondsdokument – muss vom Server abgelehnt werden
+    write_pages("Kochrezept_Test.pdf", [("Apfelkuchen nach Omas Art", [
+        "Zutaten: 500 g Mehl, 250 g Butter, 200 g Zucker, 3 Eier, 1 kg Äpfel.",
+        "Den Teig kneten und eine Stunde kühlen. Die Äpfel schälen und in Spalten schneiden.",
+        "Bei 180 Grad etwa 45 Minuten backen. Mit Puderzucker bestreuen und servieren.",
+    ])])
     print("Testunterlagen erzeugt in", HERE)

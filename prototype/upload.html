@@ -61,11 +61,18 @@
           <p class="field-error" id="code-error" hidden><i data-icon="mittel"></i><span>Bitte geben Sie den Zugangscode ein.</span></p>
         </div>
 
+        <div class="hp" aria-hidden="true"><label for="website">Website (bitte leer lassen)</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+
         <label class="consent" for="consent">
           <input type="checkbox" id="consent">
           <span>Ich bin berechtigt, diese Unterlagen hochzuladen, und bin einverstanden, dass sie ausschließlich zur Erstellung meines Berichts verarbeitet und dafür an den KI-Dienst Anthropic übermittelt werden. Ich habe verstanden, dass der Bericht eine Orientierung bietet und keine Anlageberatung ersetzt. <a href="sicherheit.html">Datenschutzhinweise</a></span>
         </label>
         <p class="field-error" id="consent-error" hidden><i data-icon="mittel"></i><span>Bitte bestätigen Sie die Einwilligung, damit wir Ihre Unterlagen analysieren können.</span></p>
+
+        <div id="turnstile-field" hidden style="margin-top:16px">
+          <div id="turnstile"></div>
+          <p class="field-error" id="turnstile-error" hidden><i data-icon="mittel"></i><span>Bitte warten Sie, bis die Sicherheitsprüfung abgeschlossen ist.</span></p>
+        </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-primary" id="start-btn">Analyse starten<i data-icon="arrow"></i></button>

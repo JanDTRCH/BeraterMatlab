@@ -28,6 +28,7 @@
   let files = [];
   let seq = 0;
   let status = { ki: false, zugangscode: false, geladen: false };
+  let turnstileToken = '', turnstileId = null, turnstileAktiv = false;
   let busy = false;
   let FL;
 
@@ -134,6 +135,7 @@
     }
     const code = document.getElementById('zugangscode');
     if (status.zugangscode && !code.value.trim()) { showError('code-error'); ok = false; }
+    if (turnstileAktiv && !turnstileToken) { showError('turnstile-error'); ok = false; }
     if (!document.getElementById('consent').checked) { showError('consent-error'); ok = false; }
     if (!ok) {
       const first = document.querySelector('.field-error:not([hidden])');
@@ -146,6 +148,8 @@
     fd.append('typen', JSON.stringify(usable.map(function (f) { return f.type; })));
     fd.append('einwilligung', 'ja');
     if (status.zugangscode) fd.append('zugangscode', code.value.trim());
+    fd.append('website', document.getElementById('website').value); // Honeypot
+    if (turnstileAktiv) fd.append('cf-turnstile-response', turnstileToken);
 
     setBusy(true);
     progress(0);
@@ -161,7 +165,8 @@
         return;
       }
       setBusy(false);
-      if (xhr.status === 403) { showError('code-error', body.fehler); code.focus(); return; }
+      resetTurnstile(); // ein Token gilt nur einmal
+      if (xhr.status === 403 && /Zugangscode/.test(body.fehler || '')) { showError('code-error', body.fehler); code.focus(); return; }
       showError('submit-error', body.fehler || 'Die Unterlagen konnten nicht übertragen werden. Bitte versuchen Sie es erneut.');
     };
     xhr.onerror = function () {
@@ -171,11 +176,34 @@
     xhr.send(fd);
   }
 
+  function resetTurnstile() {
+    if (turnstileAktiv && window.turnstile && turnstileId !== null) { turnstileToken = ''; window.turnstile.reset(turnstileId); }
+  }
+
+  function initTurnstile(siteKey) {
+    turnstileAktiv = true;
+    document.getElementById('turnstile-field').hidden = false;
+    window.onTurnstileLoad = function () {
+      turnstileId = window.turnstile.render('#turnstile', {
+        sitekey: siteKey,
+        language: 'de',
+        callback: function (t) { turnstileToken = t; hideError('turnstile-error'); },
+        'expired-callback': function () { turnstileToken = ''; },
+        'error-callback': function () { turnstileToken = ''; }
+      });
+    };
+    const sc = document.createElement('script');
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
+    sc.async = true;
+    document.head.appendChild(sc);
+  }
+
   function loadStatus() {
     fetch('/api/status').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (s) {
       status = { ki: !!s.ki, zugangscode: !!s.zugangscode, geladen: true };
       if (s.maxGesamtMB) maxGesamt = s.maxGesamtMB * MB;
       document.getElementById('code-field').hidden = !status.zugangscode;
+      if (s.turnstileSiteKey && status.ki) initTurnstile(s.turnstileSiteKey);
       if (!status.ki) {
         const box = document.getElementById('ki-status');
         box.querySelector('p').innerHTML = '<strong>Die echte Analyse ist auf diesem Server noch nicht eingerichtet.</strong> Sie können sich die <a href="analyse.html?demo=1">Beispielanalyse</a> mit fiktiven Unterlagen ansehen.';
