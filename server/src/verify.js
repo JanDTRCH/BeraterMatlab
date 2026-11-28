@@ -98,9 +98,10 @@ export function buildReport(analyse, docs, meta) {
   const cache = new Map(); // gleiche Belege nur einmal prüfen
 
   function checkBeleg(b) {
-    stats.gesamt++;
     const key = `${b.dok}|${b.seite}|${b.zitat}`;
-    if (cache.has(key)) { const id = cache.get(key); if (!id) stats.verworfen++; return id; }
+    // Mehrfach zitierte Fundstellen nur einmal prüfen und zählen
+    if (cache.has(key)) return cache.get(key);
+    stats.gesamt++;
     const doc = docs[b.dok - 1];
     let id = null;
     if (doc && Number.isInteger(b.seite) && b.seite >= 1 && b.seite <= doc.seiten.length && String(b.zitat || '').trim()) {

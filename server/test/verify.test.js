@@ -114,6 +114,9 @@ test('buildReport: bestätigt, korrigiert, verwirft und kennzeichnet Scan-Belege
   assert.deepEqual(r.kosten.befunde[0].fragen, ['q1']);
   // Statistik
   assert.equal(r.pruefung.verworfen, 2);
+  // Jede Fundstelle zählt einmal (SRI-Zitat kommt zweimal vor): gesamt = bestätigt + korrigiert + ungeprüft + verworfen
+  const p = r.pruefung;
+  assert.equal(p.gesamt, p.bestaetigt + p.korrigiert + p.ungeprueft + p.verworfen);
   assert.equal(r.pruefung.befundeEntfernt, 1);
   assert.equal(r.dokumente.D2.sicherheit, 'mittel');
 });
