@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { timingSafeEqual } from 'node:crypto';
 import { starteJob, getJob, publicStatus, loescheJob, laufendeJobs } from './jobs.js';
-import { kiVerfuegbar, MODEL } from './claude.js';
+import { kiVerfuegbar, MODELL_ANZEIGE as MODEL, ANBIETER } from './ki.js';
 import { budgetFrei, budgetStand } from './budget.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -127,7 +127,7 @@ function fehler(res, status, text) { return res.status(status).json({ fehler: te
 
 // ---------- API ----------
 app.get('/api/status', (req, res) => {
-  res.json({ ki: kiVerfuegbar(), zugangscode: Boolean(ZUGANGSCODE), turnstileSiteKey: TURNSTILE ? TURNSTILE_SITE_KEY : null, maxDateien: MAX_DATEIEN, maxGesamtMB: MAX_GESAMT / MB });
+  res.json({ ki: kiVerfuegbar(), anbieter: ANBIETER, zugangscode: Boolean(ZUGANGSCODE), turnstileSiteKey: TURNSTILE ? TURNSTILE_SITE_KEY : null, maxDateien: MAX_DATEIEN, maxGesamtMB: MAX_GESAMT / MB });
 });
 
 app.post('/api/analysen', (req, res) => {
@@ -203,6 +203,6 @@ app.use((req, res) => res.status(404).type('text/plain; charset=utf-8').send('Se
 
 const server = app.listen(PORT, () => {
   const b = budgetStand();
-  console.log(`Fondslupe läuft auf Port ${PORT} · KI ${kiVerfuegbar() ? 'aktiv (' + MODEL + ')' : 'nicht eingerichtet (ANTHROPIC_API_KEY fehlt)'} · Zugangscode ${ZUGANGSCODE ? 'aktiv' : 'AUS – jeder mit dem Link kann Analysen starten'} · Turnstile ${TURNSTILE ? 'aktiv' : 'aus'} · Tagesbudget ${b.limit} USD`);
+  console.log(`Fondslupe läuft auf Port ${PORT} · KI ${kiVerfuegbar() ? 'aktiv (' + ANBIETER + ': ' + MODEL + (ANBIETER === 'lokal' ? ' über ' + (process.env.LOKAL_URL || 'http://localhost:1234/v1') : '') + ')' : 'nicht eingerichtet (ANTHROPIC_API_KEY fehlt)'} · Zugangscode ${ZUGANGSCODE ? 'aktiv' : 'AUS – jeder mit dem Link kann Analysen starten'} · Turnstile ${TURNSTILE ? 'aktiv' : 'aus'} · Tagesbudget ${b.limit} USD`);
 });
 server.requestTimeout = 5 * 60 * 1000;

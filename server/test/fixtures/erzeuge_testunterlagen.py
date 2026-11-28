@@ -9,6 +9,7 @@ Erzeugt im selben Ordner:
 - KID_Testfonds.pdf             3 Seiten mit Textebene
 - Kosteninformation_Test.pdf    2 Seiten mit Textebene
 - Beratungsprotokoll_Scan.pdf   2 Seiten, nur Bild (wie ein Scan, keine Textebene)
+- Beratungsprotokoll_Text.pdf   wie oben, aber mit Textebene (für die lokale KI)
 - Kochrezept_Test.pdf           kein Fondsdokument (muss abgelehnt werden)
 """
 import io
@@ -185,6 +186,8 @@ if __name__ == "__main__":
     write_pages("KID_Testfonds.pdf", KID)
     write_pages("Kosteninformation_Test.pdf", KOSTEN)
     write_scan("Beratungsprotokoll_Scan.pdf", PROTOKOLL)
+    # Gleicher Inhalt mit Textebene – für die lokale KI, die keine Scans lesen kann
+    write_pages("Beratungsprotokoll_Text.pdf", [(p[0], [l for l in p[1:] if l]) for p in PROTOKOLL])
     # Kein Fondsdokument – muss vom Server abgelehnt werden
     write_pages("Kochrezept_Test.pdf", [("Apfelkuchen nach Omas Art", [
         "Zutaten: 500 g Mehl, 250 g Butter, 200 g Zucker, 3 Eier, 1 kg Äpfel.",

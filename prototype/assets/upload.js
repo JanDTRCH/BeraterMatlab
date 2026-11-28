@@ -203,6 +203,11 @@
       status = { ki: !!s.ki, zugangscode: !!s.zugangscode, geladen: true };
       if (s.maxGesamtMB) maxGesamt = s.maxGesamtMB * MB;
       document.getElementById('code-field').hidden = !status.zugangscode;
+      if (s.anbieter === 'lokal') {
+        document.getElementById('consent-anbieter').textContent = '';
+        document.getElementById('privacy-note').textContent = 'Lokale KI: Ihre Unterlagen werden auf diesem Rechner ausgewertet und nicht an einen KI-Dienst im Internet übermittelt. Scans und Fotos kann die lokale KI noch nicht lesen – bitte PDFs mit Text verwenden.';
+        document.getElementById('start-hint').textContent = 'Dauer: etwa 5 bis 20 Minuten';
+      }
       if (s.turnstileSiteKey && status.ki) initTurnstile(s.turnstileSiteKey);
       if (!status.ki) {
         const box = document.getElementById('ki-status');

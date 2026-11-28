@@ -4,7 +4,7 @@
 // - Ein Neustart des Servers löscht alle Aufträge.
 import { randomUUID } from 'node:crypto';
 import { readPdf, UnlesbaresDokument } from './pdf.js';
-import { analysiere, AnalyseFehler, MODEL } from './claude.js';
+import { analysiere, AnalyseFehler, MODELL_ANZEIGE as MODEL, IST_LOKAL, ANBIETER, lokalZuGross } from './ki.js';
 import { buildReport } from './verify.js';
 import { kostenUsd, budgetBuchen } from './budget.js';
 
@@ -22,7 +22,9 @@ const jobs = new Map();
 export const SCHRITTE = [
   { id: 'pruefen', titel: 'Dateien sicher prüfen', text: 'Wir prüfen, ob die Dateien lesbar und unbeschädigt sind.' },
   { id: 'text', titel: 'Text erkennen', text: 'Der Text wird Seite für Seite aus den Dokumenten gelesen.' },
-  { id: 'ki', titel: 'Unterlagen auswerten', text: 'Die KI bestimmt die Dokumenttypen, liest Kosten, Risiken und Bedingungen aus und gleicht sie mit der Bankempfehlung ab. Das dauert meist 2 bis 5 Minuten.' },
+  { id: 'ki', titel: 'Unterlagen auswerten', text: IST_LOKAL
+    ? 'Die lokale KI auf diesem Rechner bestimmt die Dokumenttypen, liest Kosten, Risiken und Bedingungen aus und gleicht sie mit der Bankempfehlung ab. Das kann 5 bis 20 Minuten dauern.'
+    : 'Die KI bestimmt die Dokumenttypen, liest Kosten, Risiken und Bedingungen aus und gleicht sie mit der Bankempfehlung ab. Das dauert meist 2 bis 5 Minuten.' },
   { id: 'belege', titel: 'Fundstellen prüfen', text: 'Jedes Zitat wird automatisch auf der angegebenen Seite im Dokument gesucht. Nicht auffindbare Aussagen werden verworfen.' },
   { id: 'bericht', titel: 'Bericht erstellen', text: 'Die Ergebnisse werden zu Ihrem Bericht zusammengestellt.' }
 ];
@@ -39,6 +41,7 @@ export function publicStatus(job) {
   return {
     id: job.id,
     status: job.status,
+    anbieter: ANBIETER,
     fehler: job.fehler || null,
     gestartet: job.gestartet,
     schritte: job.schritte,
@@ -105,7 +108,7 @@ async function run(job) {
       d.seiten = [''];
       d.scanSeiten = [1];
       d.status = 'hinweis';
-      d.hinweis = 'Foto: Text wird per Bilderkennung gelesen';
+      d.hinweis = IST_LOKAL ? 'Foto: mit der lokalen KI nicht lesbar' : 'Foto: Text wird per Bilderkennung gelesen';
       continue;
     }
     try {
@@ -114,7 +117,9 @@ async function run(job) {
       d.scanSeiten = pdf.scanSeiten;
       if (pdf.scanSeiten.length) {
         d.status = 'hinweis';
-        d.hinweis = pdf.scanSeiten.length === pdf.seitenzahl ? 'Scan: Text wird per Bilderkennung gelesen' : `${pdf.scanSeiten.length} Seite(n) ohne Textebene`;
+        d.hinweis = pdf.scanSeiten.length === pdf.seitenzahl
+          ? (IST_LOKAL ? 'Scan: mit der lokalen KI nicht lesbar' : 'Scan: Text wird per Bilderkennung gelesen')
+          : `${pdf.scanSeiten.length} Seite(n) ohne Textebene` + (IST_LOKAL ? ' (nicht lesbar)' : '');
         warnungen.push(`${d.dateiname}: ${d.hinweis}.`);
       } else {
         d.status = 'gelesen';
@@ -147,6 +152,18 @@ async function run(job) {
     step(job, 'pruefen', 'fehler');
     return fail(job, 'Die Unterlagen sind zu umfangreich für eine Analyse. Bitte laden Sie nur die wichtigsten Dokumente hoch – zum Beispiel Basisinformationsblatt, Kostenübersicht und Beratungsprotokoll – oder einen gekürzten Verkaufsprospekt.');
   }
+  if (IST_LOKAL) {
+    const lesbar = job.dokumente.some((d) => !d.bild && d.scanSeiten.length < d.seiten.length);
+    if (!lesbar) {
+      step(job, 'pruefen', 'fehler');
+      return fail(job, 'Die Unterlagen enthalten nur Scans oder Fotos. Diese kann die lokale KI noch nicht lesen. Bitte laden Sie die Dokumente als PDF mit Text hoch (z. B. direkt aus dem Online-Banking) oder nutzen Sie die Analyse mit Claude.');
+    }
+    const zuGross = lokalZuGross(Math.round(zeichen / 3.5));
+    if (zuGross) {
+      step(job, 'pruefen', 'fehler');
+      return fail(job, `Die Unterlagen sind zu umfangreich für die lokale KI (benötigt ca. ${zuGross} Tokens Kontext, eingestellt sind ${process.env.LOKAL_KONTEXT || 32768}). Bitte laden Sie weniger Dokumente hoch oder erhöhen Sie die Kontextlänge in LM Studio und LOKAL_KONTEXT.`);
+    }
+  }
   const mitText = job.dokumente.filter((d) => !d.bild && d.seiten.some((t) => t.replace(/\s/g, '').length >= 40));
   if (mitText.length && !mitText.some((d) => FINANZ_WOERTER.test(d.seiten.join(' ')))) {
     step(job, 'pruefen', 'fehler');
@@ -163,7 +180,7 @@ async function run(job) {
   } catch (err) {
     if (job.status !== 'laeuft') return;
     if (err instanceof AnalyseFehler) {
-      if (err.usage) budgetBuchen(kostenUsd(err.model || MODEL, err.usage));
+      if (err.usage && !IST_LOKAL) budgetBuchen(kostenUsd(err.model || MODEL, err.usage));
       console.error(`[job ${job.id}] Analyse fehlgeschlagen: ${err.message}`);
       return fail(job, err.nutzerText);
     }
@@ -171,9 +188,9 @@ async function run(job) {
   }
   if (job.status !== 'laeuft') return;
   const u = result.usage || {};
-  const usd = kostenUsd(result.model || MODEL, u);
-  budgetBuchen(usd);
-  console.log(`[job ${job.id}] Claude fertig (${result.model}) in ${Math.round((now() - t0) / 1000)} s, Eingabe ${u.input_tokens} Tokens, Ausgabe ${u.output_tokens} Tokens, ca. ${usd.toFixed(4)} USD`);
+  const usd = IST_LOKAL ? 0 : kostenUsd(result.model || MODEL, u);
+  if (!IST_LOKAL) budgetBuchen(usd);
+  console.log(`[job ${job.id}] KI fertig (${ANBIETER}: ${result.model}) in ${Math.round((now() - t0) / 1000)} s, Eingabe ${u.input_tokens} Tokens, Ausgabe ${u.output_tokens} Tokens` + (IST_LOKAL ? ' (lokal, kostenlos)' : `, ca. ${usd.toFixed(4)} USD`));
   step(job, 'ki', 'fertig', 'Auswertung abgeschlossen.');
 
   // 4. Belege prüfen + 5. Bericht

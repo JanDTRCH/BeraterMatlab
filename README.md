@@ -46,6 +46,43 @@ Fiktive Testunterlagen (Basisinformationsblatt, Kosteninformation, gescanntes Be
 
 **Tests:** `cd server && npm test` (Belegprüfung, PDF-Auslese, API inkl. Fehlerfällen; ohne gültigen API-Schlüssel).
 
+## Lokale KI auf dem eigenen PC (kostenlos)
+
+Statt Claude kann eine frei verfügbare KI auf Ihrem PC die Analyse übernehmen. Kostenlos, die Unterlagen verlassen den Rechner nicht. Umgeschaltet wird mit der Variable `KI_ANBIETER` (`lokal` oder `claude`).
+
+**Einschränkungen:** langsamer (etwa 5–20 Minuten je Bericht), Erklärungen einfacher als mit Claude, Scans und Fotos werden noch nicht gelesen (PDFs mit Text verwenden), ein vollständiger Verkaufsprospekt ist meist zu lang. Erfundene Zitate werden wie bei Claude von der Belegprüfung verworfen.
+
+### Einrichtung unter Windows (Schritt für Schritt)
+
+1. **LM Studio installieren** von <https://lmstudio.ai>. Es nutzt AMD-Grafikkarten über Vulkan (für die RX 9070 XT geeignet).
+2. **Modell herunterladen** (in LM Studio links auf „Discover“): ein Instruct-Modell mit **12–14 Mrd. Parametern** in der Variante **Q4_K_M**, z. B. aus den Familien Qwen, Gemma oder Mistral. LM Studio zeigt an, ob das Modell vollständig in die Grafikkarte passt („Full GPU Offload“). Bei 16 GB VRAM nicht größer als ca. 14 Mrd. wählen.
+3. **Modell laden mit großer Kontextlänge:** beim Laden „Context Length“ auf **32768** stellen (Standard ist oft nur 4096 – damit schlägt die Analyse fehl) und „GPU Offload“ auf Maximum.
+4. **Lokalen Server starten:** in LM Studio links „Developer“ → „Start Server“ (Port 1234).
+5. **Node.js 22 LTS** von <https://nodejs.org> und **Git** von <https://git-scm.com> installieren.
+6. **Projekt holen und starten** (PowerShell):
+
+   ```powershell
+   git clone https://github.com/JanDTRCH/BeraterMatlab.git
+   cd BeraterMatlab\server
+   npm install
+   $env:KI_ANBIETER="lokal"; npm start
+   ```
+
+7. **Im Browser öffnen:** <http://localhost:8080> → „Unterlagen prüfen lassen“ und z. B. `server\test\fixtures\KID_Testfonds.pdf` und `Beratungsprotokoll_Text.pdf` hochladen.
+
+Weitere Einstellungen für den lokalen Betrieb:
+
+| Variable | Bedeutung |
+|---|---|
+| `LOKAL_URL` | Adresse der lokalen KI (Standard `http://localhost:1234/v1` = LM Studio; Ollama: `http://localhost:11434/v1`) |
+| `LOKAL_MODELL` | Modellname; leer = das in LM Studio geladene Modell |
+| `LOKAL_KONTEXT` | eingestellte Kontextlänge (Standard 32768, muss zu LM Studio passen) |
+| `LOKAL_MAX_AUSGABE` | maximale Länge der Antwort in Tokens (Standard 16000) |
+
+### Später auf Claude umstellen
+
+`KI_ANBIETER` weglassen oder auf `claude` setzen und `ANTHROPIC_API_KEY` angeben – lokal oder in Railway. Sonst ändert sich nichts.
+
 ## Deployment auf Railway
 
 Das `Dockerfile` baut den Node-Server; Railway erkennt es automatisch.
@@ -85,6 +122,7 @@ Die Zähler liegen im Arbeitsspeicher und werden bei einem Neustart zurückgeset
 |---|---|
 | `PORT` | setzt Railway selbst (Domain auf diesen Port zeigen lassen, z. B. 8080) |
 | `BERICHT_TTL_STUNDEN` | Aufbewahrung der Berichte (Standard 24) |
+| `KI_ANBIETER` | `claude` (Standard) oder `lokal` |
 | `CLAUDE_MODEL`, `CLAUDE_EFFORT` | Modell und Effort (Standard `claude-haiku-5-5`, `high`) |
 
 ### Kosten

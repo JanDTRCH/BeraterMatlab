@@ -35,7 +35,7 @@ export class AnalyseFehler extends Error {
   }
 }
 
-const SYSTEM = `Du analysierst Unterlagen zu einem Investmentfonds-Angebot für Privatanleger in Deutschland, die keine vertieften Finanzkenntnisse haben. Typische Unterlagen: Basisinformationsblatt (KID/PRIIP), Verkaufsprospekt und Anlagebedingungen, Ex-ante-Kosteninformation der Bank, Beratungsprotokoll oder Geeignetheitserklärung, schriftliche Empfehlung der Bank.
+export const SYSTEM = `Du analysierst Unterlagen zu einem Investmentfonds-Angebot für Privatanleger in Deutschland, die keine vertieften Finanzkenntnisse haben. Typische Unterlagen: Basisinformationsblatt (KID/PRIIP), Verkaufsprospekt und Anlagebedingungen, Ex-ante-Kosteninformation der Bank, Beratungsprotokoll oder Geeignetheitserklärung, schriftliche Empfehlung der Bank.
 
 Dein Ergebnis wird als Bericht in acht Abschnitten angezeigt: Zusammenfassung, Kosten, Risiken, Laufzeit und Rückgabe, Abgleich mit der Bankempfehlung, auffällige oder unklare Vertragsstellen, fehlende Informationen, Fragen an die Bank.
 

@@ -48,7 +48,7 @@
           <input class="sr-only" type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png">
         </div>
 
-        <p class="xs muted" style="margin-top:12px;display:flex;gap:8px;align-items:flex-start"><i data-icon="lock"></i><span>Ihre Dateien werden verschlüsselt übertragen, nur im Arbeitsspeicher verarbeitet und direkt nach der Analyse gelöscht. Für die Auswertung wird der Inhalt an den KI-Dienst Anthropic (Claude) übermittelt. <a href="sicherheit.html">Mehr zum Datenschutz</a></span></p>
+        <p class="xs muted" style="margin-top:12px;display:flex;gap:8px;align-items:flex-start"><i data-icon="lock"></i><span id="privacy-note">Ihre Dateien werden verschlüsselt übertragen, nur im Arbeitsspeicher verarbeitet und direkt nach der Analyse gelöscht. Für die Auswertung wird der Inhalt an den KI-Dienst Anthropic (Claude) übermittelt. <a href="sicherheit.html">Mehr zum Datenschutz</a></span></p>
 
         <h2 class="sr-only" id="liste-titel">Ausgewählte Unterlagen</h2>
         <ul class="file-list" id="file-list" aria-labelledby="liste-titel" aria-live="polite"></ul>
@@ -65,7 +65,7 @@
 
         <label class="consent" for="consent">
           <input type="checkbox" id="consent">
-          <span>Ich bin berechtigt, diese Unterlagen hochzuladen, und bin einverstanden, dass sie ausschließlich zur Erstellung meines Berichts verarbeitet und dafür an den KI-Dienst Anthropic übermittelt werden. Ich habe verstanden, dass der Bericht eine Orientierung bietet und keine Anlageberatung ersetzt. <a href="sicherheit.html">Datenschutzhinweise</a></span>
+          <span>Ich bin berechtigt, diese Unterlagen hochzuladen, und bin einverstanden, dass sie ausschließlich zur Erstellung meines Berichts verarbeitet<span id="consent-anbieter"> und dafür an den KI-Dienst Anthropic übermittelt</span> werden. Ich habe verstanden, dass der Bericht eine Orientierung bietet und keine Anlageberatung ersetzt. <a href="sicherheit.html">Datenschutzhinweise</a></span>
         </label>
         <p class="field-error" id="consent-error" hidden><i data-icon="mittel"></i><span>Bitte bestätigen Sie die Einwilligung, damit wir Ihre Unterlagen analysieren können.</span></p>
 

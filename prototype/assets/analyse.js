@@ -91,7 +91,8 @@
     steps.forEach(function (s) { if (s.status === 'fertig' || s.status === 'hinweis') pct += weights[s.id] || 0; });
     if (active && active.id === 'ki') {
       const elapsed = Date.now() - job.gestartet;
-      pct += Math.min(70, Math.round(elapsed / (4 * 60 * 1000) * 70)); // Schätzung, max. 70 von 75
+      const erwartet = (job.anbieter === 'lokal' ? 12 : 4) * 60 * 1000; // grobe Erwartung der Dauer
+      pct += Math.min(70, Math.round(elapsed / erwartet * 70)); // Schätzung, max. 70 von 75
     }
     pct = Math.min(job.status === 'fertig' ? 100 : 99, pct);
     setOverall(pct, job.status === 'fertig' ? 'Analyse abgeschlossen'
@@ -132,6 +133,7 @@
 
   function initReal() {
     document.getElementById('early-title').textContent = 'Zwischenstand';
+    document.getElementById('analyse-lead').textContent = 'Das dauert in der Regel einige Minuten. Bitte lassen Sie diese Seite geöffnet.';
     document.getElementById('early-note').textContent = 'Den Link zu dieser Seite können Sie sich merken: Der Bericht bleibt 24 Stunden abrufbar.';
     poll();
     document.getElementById('cancel-btn').addEventListener('click', function () {
