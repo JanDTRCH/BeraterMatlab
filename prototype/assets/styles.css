@@ -631,6 +631,8 @@ dialog[open] { animation: dlg-in var(--dur) var(--ease); }
 
 /* Druck / PDF */
 @media print {
+  /* Farben von Markierungen und Sicherheitsbalken mitdrucken */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   :root { --bg: #fff; }
   body { font-size: 11pt; background: #fff; }
   .site-header, .site-footer, .toc, .report-actions, .q-toolbar, .src-btn svg, .skip-link, .no-print, .toast, dialog { display: none !important; }

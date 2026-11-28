@@ -67,6 +67,8 @@ test('buildReport: bestätigt, korrigiert, verwirft und kennzeichnet Scan-Belege
     kosten: {
       tabelle: [{ art: 'Laufende Kosten', erklaerung: 'E', status: 'info', notiz: '', werte: [
         { text: '2,05 %', beleg: beleg(1, 3, 'Verwaltungs- oder Betriebskosten: 2,05 % des Werts') } // falsche Seite (richtig: 2)
+      ] }, { art: 'Erfolgsabhängige Gebühr', erklaerung: 'E', status: 'hoch', notiz: '', werte: [
+        { text: 'keine', beleg: beleg(1, 2, 'Für dieses Produkt wird keine Erfolgsgebühr berechnet.') } // fälschlich "hoch"
       ] }],
       beispiel: { vorhanden: false, text: '', werte: [], ki: '' },
       befunde: [
@@ -75,14 +77,14 @@ test('buildReport: bestätigt, korrigiert, verwirft und kennzeichnet Scan-Belege
       ]
     },
     risiken: { sri: { wert: 5, belege: [beleg(1, 1, 'Risikoklasse 5 eingestuft')] }, befunde: [] },
-    laufzeit: { fakten: [], befunde: [] },
+    laufzeit: { fakten: [], befunde: [befund('Rücknahme kann ausgesetzt werden', [beleg(1, 3, 'Die Gesellschaft kann die Rücknahme aussetzen')])] },
     abgleich: { moeglich: true, zeilen: [{
       merkmal: 'Anlagedauer',
       fonds: { text: '6 Jahre', vorhanden: true, belege: [beleg(1, 1, 'Empfohlene Haltedauer: 6 Jahre.')] },
       bank: { text: 'bis 3 Jahre', vorhanden: true, belege: [beleg(2, 1, 'Anlagehorizont: kurzfristig (bis 3 Jahre)', 'hoch')] },
       ergebnis: 'abweichung', ki: 'KI', fragen: ['q1']
     }] },
-    vertrag: { befunde: [] },
+    vertrag: { befunde: [befund('Aussetzung (doppelt)', [beleg(1, 3, 'Die Gesellschaft kann die Rücknahme aussetzen')])] },
     fehlend: { befunde: [befund('Jahresbericht fehlt', [], { stufe: 'fehlt' })] },
     fragen: [{ gruppe: 'Kosten', items: [{ id: 'q1', text: 'Frage?', warum: 'Anlass' }, { id: 'q1', text: 'Doppelt', warum: '' }] }]
   };
@@ -101,7 +103,19 @@ test('buildReport: bestätigt, korrigiert, verwirft und kennzeichnet Scan-Belege
   assert.ok(r.belege[w.belegId].vor.length > 0, 'Kontext wird mitgeliefert');
   // Befunde
   assert.deepEqual(r.kosten.befunde.map((f) => f.titel), ['Echt']);
-  assert.equal(r.fehlend.befunde.length, 1, 'Fehlt-Befund ohne Beleg bleibt');
+  // Fehlende Unterlagen ergänzt der Server (hochgeladen: KID + Protokoll)
+  const fehlTitel = r.fehlend.befunde.map((f) => f.titel);
+  assert.ok(fehlTitel.includes('Kostenübersicht der Bank fehlt'));
+  assert.ok(fehlTitel.includes('Verkaufsprospekt fehlt'));
+  assert.ok(!fehlTitel.some((t) => /Basisinformationsblatt|Beratungsprotokoll/.test(t)), 'vorhandene Unterlagen nicht als fehlend');
+  assert.ok(fehlTitel.includes('Jahresbericht fehlt'), 'Fehlt-Befund der KI ohne Beleg bleibt');
+  const unterlagenFragen = r.fragen.flatMap((g) => g.items).map((q) => q.id);
+  assert.ok(unterlagenFragen.includes('u-kosten') && unterlagenFragen.includes('u-prospekt'));
+  // "keine Erfolgsgebühr" darf nicht als auffällig markiert sein
+  assert.equal(r.kosten.tabelle[1].status, 'niedrig');
+  // Gleiche Klausel in zwei Abschnitten: nur in "Laufzeit" behalten
+  assert.equal(r.laufzeit.befunde.length, 1);
+  assert.equal(r.vertrag.befunde.length, 0);
   // Scan-Beleg: behalten, aber höchstens mittel
   const bank = r.abgleich.zeilen[0].bank;
   assert.equal(r.belege[bank.belegId].pruefung, 'ungeprueft');

@@ -52,12 +52,17 @@ Verbindliche Regeln:
 Inhalte der Abschnitte:
 - dokumente: je Unterlage Typ, Bezeichnung, Stand und ob sie erkennbar unvollständig ist (z. B. Inhaltsverzeichnis nennt mehr Seiten, als vorhanden sind).
 - zusammenfassung.fakten: Fondsname, ISIN, Fondsart, Fondsgesellschaft, Fondswährung, Risikoklasse (SRI), empfohlene Haltedauer, Laufzeit, empfohlener Anlagebetrag, Ertragsverwendung, Nachhaltigkeitseinstufung – soweit vorhanden, sonst als fehlend.
-- kosten.tabelle: Ausgabeaufschlag, laufende Kosten, Transaktionskosten, erfolgsabhängige Gebühr, Rücknahmeabschlag, Zuwendungen an die Bank, Depot- und Servicekosten. Jeder Wert mit eigenem Beleg; Werte aus verschiedenen Unterlagen als getrennte Einträge in "werte". kosten.beispiel: das Kostenbeispiel des Basisinformationsblatts (Kosten im Zeitverlauf), falls vorhanden.
-- risiken: SRI und Befunde zu Verlustrisiko, Schwankungen, Währungsrisiko, Konzentration, Liquidität, Derivaten und weiteren genannten Risiken.
+- kosten.tabelle: genau eine Zeile je Kostenart, in dieser Reihenfolge: Ausgabeaufschlag (Einstiegskosten), laufende Kosten (Verwaltungs- und Betriebskosten), Transaktionskosten, erfolgsabhängige Gebühr, Rücknahmeabschlag (Ausstiegskosten), Zuwendungen an die Bank, Depot- und Servicekosten. Ordne jeden Wert der richtigen Zeile zu – Transaktionskosten sind keine laufenden Kosten. Jeder Wert mit eigenem Beleg; Werte aus verschiedenen Unterlagen als getrennte Einträge in "werte". Keine eigenen Summen oder Rechnungen in der Tabelle; "notiz" enthält nur Hinweise aus den Unterlagen oder bleibt leer.
+  Status je Zeile: "niedrig" = für Anleger günstig oder unauffällig (z. B. keine Gebühr, 0 %); "info" = übliche Kosten ohne Besonderheit; "mittel" = spürbar, aber nicht ungewöhnlich; "hoch" = auffällig hoch oder ungewöhnlich; "unklar" = widersprüchliche Angaben; "fehlt" = nicht in den Unterlagen.
+  kosten.beispiel: das Kostenbeispiel des Basisinformationsblatts (Kosten im Zeitverlauf), falls vorhanden.
+- risiken: SRI und Befunde zu Verlustrisiko, Schwankungen, Währungsrisiko, Konzentration, Liquidität, Derivaten und weiteren genannten Risiken. Beim Verlustrisiko die Performance-Szenarien des Basisinformationsblatts nennen, besonders das Stressszenario (mit Zahl und Beleg).
 - laufzeit: Laufzeit, empfohlene Haltedauer, Rückgabemöglichkeit und -kosten, Kündigung; Befunde zu Rücknahmebeschränkung, Aussetzung, Kündigungsrecht der Gesellschaft.
 - abgleich: Anlagedauer, Verlusttragfähigkeit, Risikobereitschaft, Nachhaltigkeitspräferenzen, Anlageziel, Kosten, Kenntnisse und Erfahrungen, Begründung der Empfehlung. Ohne Beratungsprotokoll/Geeignetheitserklärung: moeglich = false und keine Zeilen.
+  Verlusttragfähigkeit: Auf der Fondsseite das Stressszenario bzw. den möglichen Verlust aus dem Basisinformationsblatt angeben (Zahl mit Beleg). Liegt dieser Verlust deutlich über der im Protokoll genannten Verlustgrenze, ist das Ergebnis "abweichung".
+  Ergebnis "passt" nur, wenn beide Seiten belegt sind und zusammenpassen; "abweichung", wenn sie sich klar widersprechen; "pruefen", wenn es Spannungen gibt; "unklar", wenn die Angaben nicht vergleichbar sind (z. B. verschiedene Skalen ohne Zuordnung); "fehlt", wenn eine Seite keine Angabe hat.
 - vertrag: Klauseln, die erklärungsbedürftig sind (z. B. Spielraum bei Vergütungen, Änderung der Anlagebedingungen, Swing Pricing, fehlende Unterschriften).
-- fehlend: fehlende Unterlagen, Seiten und Angaben, die für eine Einschätzung wichtig wären.
+- fehlend: fehlende Seiten und Angaben, die für eine Einschätzung wichtig wären (fehlende ganze Unterlagen ergänzt der Server selbst).
+- Jede Klausel und jeden Sachverhalt nur in einem Abschnitt behandeln: Rücknahme, Aussetzung und Kündigung gehören zu "laufzeit", nicht zusätzlich zu "risiken" oder "vertrag".
 - fragen: 6–15 konkrete Fragen an die Bank in der Ich-Form, gruppiert (z. B. "Kosten", "Passt das Angebot zu mir?", "Rückgabe und Risiko", "Unterlagen"), IDs "q1", "q2", …; "warum" nennt den Anlass. Befunde und Abgleichzeilen verweisen über "fragen" auf diese IDs.`;
 
 /**

@@ -30,6 +30,25 @@ export const EINLEITUNGEN = {
   fehlend: 'Diese Informationen konnten wir nicht finden oder nicht eindeutig lesen. Wir haben keine Werte ergänzt oder geschätzt.'
 };
 
+// Fehlende Unterlagen erkennt der Server selbst (zuverlässiger als die KI).
+const UNTERLAGEN = [
+  { typ: 'kid', muster: /basisinformation|\bkid\b|priip/i, titel: 'Basisinformationsblatt (KID) fehlt',
+    klartext: 'Das gesetzlich vorgeschriebene Basisinformationsblatt lag nicht vor. Es enthält Risikoklasse, Kosten und Szenarien in einheitlicher Form.',
+    frage: 'Bitte senden Sie mir das aktuelle Basisinformationsblatt (KID) zu diesem Fonds.' },
+  { typ: 'kosten', muster: /kosten(übersicht|information)|ex.?ante/i, titel: 'Kostenübersicht der Bank fehlt',
+    klartext: 'Die Kostenübersicht der Bank (Ex-ante-Kosteninformation) lag nicht vor. Ohne sie sind Ihre tatsächlichen Kosten nicht bekannt – etwa ein gewährter Rabatt auf den Ausgabeaufschlag, Depotkosten und Zuwendungen an die Bank.',
+    frage: 'Bitte senden Sie mir die Kostenübersicht (Ex-ante-Kosteninformation) für meinen Anlagebetrag, einschließlich Depotkosten und Zuwendungen an die Bank.' },
+  { typ: 'prospekt', muster: /prospekt|anlagebedingungen/i, titel: 'Verkaufsprospekt fehlt',
+    klartext: 'Der Verkaufsprospekt mit den Anlagebedingungen lag nicht vor. Er regelt zum Beispiel Vergütungen, Rücknahmebeschränkungen und Änderungen der Anlagebedingungen.',
+    frage: 'Bitte senden Sie mir den vollständigen Verkaufsprospekt mit den Anlagebedingungen.' },
+  { typ: 'protokoll', muster: /protokoll|geeignetheit/i, titel: 'Beratungsprotokoll fehlt',
+    klartext: 'Ohne Beratungsprotokoll oder Geeignetheitserklärung ist kein Abgleich der Fondsangaben mit Ihrer Bankempfehlung möglich.',
+    frage: 'Bitte senden Sie mir die Geeignetheitserklärung bzw. das Beratungsprotokoll zu dieser Empfehlung.' }
+];
+
+// "keine Gebühr", "0 %" usw. – für Anleger günstig, nie als auffällig markieren
+const KEINE_KOSTEN = /^\s*(keine?r?s?\b|kein\b|entfällt|0([,.]0+)?\s*%|wir berechnen keine|für dieses produkt wird keine)/i;
+
 const RANK = { niedrig: 1, mittel: 2, hoch: 3 };
 const capAt = (s, max) => (RANK[s] > RANK[max] ? max : s);
 
@@ -207,7 +226,9 @@ export function buildReport(analyse, docs, meta) {
     }).filter(Boolean);
     if (!werte.length && row.status !== 'fehlt') return { art: row.art, erklaerung: row.erklaerung, werte: [{ text: 'Nicht eindeutig belegt', fehlt: true }], status: 'unklar', sicherheit: null, notiz: row.notiz };
     if (!werte.length) return { art: row.art, erklaerung: row.erklaerung, werte: [{ text: 'Keine Angabe gefunden', fehlt: true }], status: 'fehlt', sicherheit: null, notiz: row.notiz };
-    return { art: row.art, erklaerung: row.erklaerung, werte, status: row.status, sicherheit: belege[werte[0].belegId].sicherheit, notiz: row.notiz };
+    let status = row.status;
+    if ((status === 'hoch' || status === 'mittel') && werte.every((w) => KEINE_KOSTEN.test(w.text))) status = 'niedrig';
+    return { art: row.art, erklaerung: row.erklaerung, werte, status, sicherheit: belege[werte[0].belegId].sicherheit, notiz: row.notiz };
   });
 
   let beispiel = null;
@@ -270,6 +291,37 @@ export function buildReport(analyse, docs, meta) {
     sec.befunde.forEach((f) => { f.fragen = valid(f.fragen); });
   }
   report.abgleich.zeilen.forEach((zl) => { zl.fragen = valid(zl.fragen); });
+
+  // Gleicher Sachverhalt in mehreren Abschnitten (identische Belege) nur einmal zeigen.
+  // Reihenfolge = Vorrang: Rückgabe-Klauseln gehören zu "Laufzeit und Rückgabe".
+  const gesehen = new Set();
+  for (const sec of [report.kosten, report.laufzeit, report.risiken, report.vertrag]) {
+    sec.befunde = sec.befunde.filter((f) => {
+      if (!f.belege.length) return true;
+      const key = [...f.belege].map((id) => belege[id].dok + ':' + belege[id].seite + ':' + belege[id].zitat).sort().join('|');
+      if (gesehen.has(key)) { stats.doppelteEntfernt = (stats.doppelteEntfernt || 0) + 1; return false; }
+      gesehen.add(key);
+      return true;
+    });
+  }
+
+  // Fehlende Unterlagen: aus den hochgeladenen Dokumenttypen ableiten
+  const vorhanden = new Set([...docs.map((d) => d.typ), ...(analyse.dokumente || []).map((d) => d.typ)]);
+  const alleFragen = () => report.fragen.flatMap((g) => g.items);
+  const neueBefunde = [];
+  for (const u of UNTERLAGEN) {
+    if (vorhanden.has(u.typ)) continue;
+    if (report.fehlend.befunde.some((f) => u.muster.test(f.titel))) continue;
+    let frage = alleFragen().find((q) => u.muster.test(q.text) && /send|zukommen|bitte/i.test(q.text));
+    if (!frage) {
+      frage = { id: 'u-' + u.typ, text: u.frage, warum: u.titel + '.' };
+      let gruppe = report.fragen.find((g) => /unterlagen/i.test(g.gruppe));
+      if (!gruppe) { gruppe = { gruppe: 'Unterlagen', items: [] }; report.fragen.push(gruppe); }
+      gruppe.items.push(frage);
+    }
+    neueBefunde.push({ id: 'fu-' + u.typ, titel: u.titel, stufe: 'fehlt', klartext: u.klartext, belege: [], ki: [], sicherheit: null, sicherheitGrund: '', fragen: [frage.id] });
+  }
+  report.fehlend.befunde = neueBefunde.concat(report.fehlend.befunde);
 
   return report;
 }
