@@ -38,7 +38,7 @@ const ANTWORT = {
 function startMock() {
   return new Promise((resolve) => {
     mock = http.createServer((req, res) => {
-      if (req.url === '/v1/models') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify({ data: [{ id: 'test-modell-14b' }] })); }
+      if (req.url === '/v1/models') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify({ data: [{ id: 'text-embedding-nomic-embed-text-v1.5' }, { id: 'test-modell-14b' }] })); }
       if (req.url === '/v1/chat/completions') {
         let body = '';
         req.on('data', (c) => { body += c; });
@@ -99,7 +99,7 @@ test('Analyse mit lokaler KI: Anfrageformat, Stream, Belegprüfung', async () =>
   assert.equal(s.anbieter, 'lokal');
 
   // Anfrage an die lokale KI
-  assert.equal(letzteAnfrage.model, 'test-modell-14b', 'Modell aus /models gewählt');
+  assert.equal(letzteAnfrage.model, 'test-modell-14b', 'Modell aus /models gewählt, Embedding-Modell übersprungen');
   assert.equal(letzteAnfrage.stream, true);
   assert.equal(letzteAnfrage.response_format.type, 'json_schema');
   assert.ok(letzteAnfrage.response_format.json_schema.schema.properties.kosten);

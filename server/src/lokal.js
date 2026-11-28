@@ -51,7 +51,10 @@ async function modellWaehlen(signal) {
   const r = await fetch(BASIS + '/models', { signal });
   if (!r.ok) throw new Error('models ' + r.status);
   const data = await r.json();
-  const id = data && data.data && data.data[0] && data.data[0].id;
+  // Hilfsmodelle für Embeddings (Textvektoren) können keine Berichte schreiben – überspringen
+  const ids = ((data && data.data) || []).map((m) => m.id).filter(Boolean);
+  const id = ids.find((x) => !/embed|rerank/i.test(x));
+  console.log(`Lokale KI: verfügbare Modelle ${ids.join(', ') || '–'} → verwende ${id || '–'}`);
   if (!id) throw new AnalyseFehler('In der lokalen KI ist kein Modell geladen. Bitte laden Sie in LM Studio ein Modell und starten Sie den Server.', 'kein Modell');
   modellCache = id;
   return id;
